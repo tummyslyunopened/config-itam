@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Swap Hardware — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Swap Hardware</h1>
+  <a href="{% url 'config_detail' config.pk %}" class="btn btn-secondary">Cancel</a>
+</div>
+<div class="card" style="max-width:480px">
+  <p style="margin-bottom:4px">Config: <strong>{{ config.hostname }}</strong></p>
+  <p style="margin-bottom:16px;color:#64748b">
+    Current hardware: {% if current_asset %}<a href="{% url 'asset_detail' current_asset.pk %}">{{ current_asset }}</a>{% else %}none{% endif %}
+  </p>
+  <p style="margin-bottom:16px;font-size:13px;color:#64748b">
+    Selecting a new asset will close the current hardware record (today) and open a new one.
+    All VM configs hosted on this config will automatically reflect the new serial.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label>{{ field.label }}</label>{{ field }}
+      {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Swap</button>
+  </form>
+</div>
+{% endblock %}

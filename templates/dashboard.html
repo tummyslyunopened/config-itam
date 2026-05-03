@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ITAM{% endblock %}
+{% block content %}
+<div class="page-header"><h1>Dashboard</h1></div>
+<div class="stats">
+  <div class="stat"><div class="stat-value">{{ asset_count }}</div><div class="stat-label">Total Assets</div></div>
+  <div class="stat"><div class="stat-value">{{ active_count }}</div><div class="stat-label">Active</div></div>
+  <div class="stat"><div class="stat-value">{{ config_count }}</div><div class="stat-label">Configs</div></div>
+  <div class="stat"><div class="stat-value">{{ contact_count }}</div><div class="stat-label">Contacts</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div>
+    <h2>Recent Assets</h2>
+    <table>
+      <thead><tr><th>Asset</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for a in recent_assets %}
+      <tr>
+        <td><a href="{% url 'asset_detail' a.pk %}">{{ a }}</a></td>
+        <td><span class="badge badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+      </tr>
+      {% empty %}<tr><td colspan="2" style="color:#94a3b8">No assets yet</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <div style="margin-top:8px"><a href="{% url 'asset_list' %}" class="btn btn-secondary btn-sm">All assets</a></div>
+  </div>
+  <div>
+    <h2>Recent Configs</h2>
+    <table>
+      <thead><tr><th>Hostname</th><th>Type</th></tr></thead>
+      <tbody>
+      {% for c in recent_configs %}
+      <tr>
+        <td><a href="{% url 'config_detail' c.pk %}">{{ c.hostname }}</a></td>
+        <td><span class="badge badge-{{ c.config_type }}">{{ c.get_config_type_display }}</span></td>
+      </tr>
+      {% empty %}<tr><td colspan="2" style="color:#94a3b8">No configs yet</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <div style="margin-top:8px"><a href="{% url 'config_list' %}" class="btn btn-secondary btn-sm">All configs</a></div>
+  </div>
+</div>
+{% endblock %}

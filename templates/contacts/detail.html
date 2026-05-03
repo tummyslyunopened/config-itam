@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.name }} — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ contact.name }}</h1>
+  <a href="{% url 'contact_edit' contact.pk %}" class="btn btn-secondary">Edit</a>
+</div>
+<div class="card" style="max-width:400px">
+  <table>
+    <tr><td>Email</td><td>{{ contact.email|default:"—" }}</td></tr>
+    <tr><td>Phone</td><td>{{ contact.phone|default:"—" }}</td></tr>
+    <tr><td>Department</td><td>{{ contact.department|default:"—" }}</td></tr>
+  </table>
+</div>
+
+<h2>Config Assignments</h2>
+<table>
+  <thead><tr><th>Config</th><th>Assigned</th><th>Returned</th></tr></thead>
+  <tbody>
+  {% for a in assignments %}
+  <tr>
+    <td><a href="{% url 'config_detail' a.config.pk %}">{{ a.config.hostname }}</a></td>
+    <td>{{ a.assigned_date }}</td>
+    <td>{{ a.returned_date|default:"current" }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="3" style="color:#94a3b8">No assignments</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

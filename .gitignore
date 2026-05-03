@@ -1,3 +1,17 @@
 # Secrets
 .env
 .env.*
+.claudeignore
+
+# Claude configuration
+.claude/
+
+# Application data
+.data/*
+!.data/.gitkeep
+
+# Sensitive data files
+*.csv
+*.sqlite
+*.sqlite3
+*.db

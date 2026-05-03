@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ config }} — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ config }}</h1>
+  <div class="actions">
+    <a href="{% url 'config_edit' config.pk %}" class="btn btn-secondary">Edit</a>
+    <a href="{% url 'config_swap' config.pk %}" class="btn btn-secondary">Swap Hardware</a>
+    {% if current_contact %}
+    <form method="post" action="{% url 'config_unassign' config.pk %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn btn-secondary">Unassign Contact</button></form>
+    {% else %}
+    <a href="{% url 'config_assign' config.pk %}" class="btn btn-secondary">Assign Contact</a>
+    {% endif %}
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div class="card">
+    <h3>Identity</h3>
+    <table>
+      <tr><td>Type</td><td><span class="badge badge-{{ config.config_type }}">{{ config.get_config_type_display }}</span></td></tr>
+      {% if config.host_config %}<tr><td>Host Config</td><td><a href="{% url 'config_detail' config.host_config.pk %}">{{ config.host_config }}</a></td></tr>{% endif %}
+      <tr><td>Effective Serial</td><td>{{ config.effective_serial|default:"—" }}</td></tr>
+    </table>
+    {% if config.notes %}<p style="margin-top:10px;color:#64748b;font-size:13px">{{ config.notes }}</p>{% endif %}
+  </div>
+
+  <div>
+    <div class="card">
+      <h3>Current Hardware</h3>
+      {% if current_asset %}
+      <p><a href="{% url 'asset_detail' current_asset.pk %}">{{ current_asset }}</a></p>
+      <p style="color:#64748b;font-size:13px">Serial: {{ current_asset.serial|default:"—" }}</p>
+      {% else %}<p style="color:#94a3b8">No hardware assigned</p>{% endif %}
+    </div>
+    <div class="card">
+      <h3>Contact</h3>
+      {% if current_contact %}
+      <p><a href="{% url 'contact_detail' current_contact.pk %}">{{ current_contact }}</a></p>
+      <p style="color:#64748b;font-size:13px">{{ current_contact.email }}</p>
+      {% else %}<p style="color:#94a3b8">No contact assigned</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<h2>Configuration Data</h2>
+<div class="card">
+  {% if config.data %}
+  <pre style="font-size:13px;overflow-x:auto;white-space:pre-wrap">{{ config.data|pprint }}</pre>
+  {% else %}
+  <p style="color:#94a3b8">No configuration data</p>
+  {% endif %}
+</div>
+
+{% if vm_configs %}
+<h2>Virtual Machines on this host</h2>
+<table>
+  <thead><tr><th>Config</th><th>Effective Serial</th></tr></thead>
+  <tbody>
+  {% for vm in vm_configs %}
+  <tr>
+    <td><a href="{% url 'config_detail' vm.pk %}">{{ vm }}</a></td>
+    <td>{{ vm.effective_serial|default:"—" }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>Hardware History</h2>
+<table>
+  <thead><tr><th>Asset</th><th>Assigned</th><th>Removed</th></tr></thead>
+  <tbody>
+  {% for h in asset_history %}
+  <tr>
+    <td><a href="{% url 'asset_detail' h.asset.pk %}">{{ h.asset }}</a></td>
+    <td>{{ h.assigned_date }}</td>
+    <td>{{ h.removed_date|default:"current" }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="3" style="color:#94a3b8">No history</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+<h2>Contact History</h2>
+<table>
+  <thead><tr><th>Contact</th><th>Assigned</th><th>Returned</th></tr></thead>
+  <tbody>
+  {% for a in assignments %}
+  <tr>
+    <td><a href="{% url 'contact_detail' a.contact.pk %}">{{ a.contact }}</a></td>
+    <td>{{ a.assigned_date }}</td>
+    <td>{{ a.returned_date|default:"current" }}</td>
+  </tr>
+  {% empty %}<tr><td colspan="3" style="color:#94a3b8">No history</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

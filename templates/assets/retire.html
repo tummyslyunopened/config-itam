@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Change Status — ITAM{% endblock %}
+{% block content %}
+<div class="page-header"><h1>Change Status: {{ asset }}</h1></div>
+<div class="card" style="max-width:400px">
+  <p style="margin-bottom:16px">Current status: <span class="badge badge-{{ asset.status }}">{{ asset.get_status_display }}</span></p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>New Status</label>
+      <select name="action">
+        <option value="active">Active</option>
+        <option value="spare">Spare</option>
+        <option value="in-repair">In Repair</option>
+        <option value="retired">Retired</option>
+        <option value="disposed">Disposed</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Update Status</button>
+      <a href="{% url 'asset_detail' asset.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

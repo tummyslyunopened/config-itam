@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Configs — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Configs</h1>
+  <div class="actions">
+    <a href="{% url 'config_export' %}" class="btn btn-secondary">Export CSV</a>
+    <a href="{% url 'config_create' %}" class="btn btn-primary">+ Add Config</a>
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name…">
+  <select name="type">
+    <option value="">All types</option>
+    {% for val, label in type_choices %}
+    <option value="{{ val }}" {% if config_type == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-secondary">Filter</button>
+  <a href="{% url 'config_list' %}" class="btn btn-secondary">Clear</a>
+</form>
+
+<table>
+  <thead>
+    <tr><th>Name</th><th>Type</th><th>Host</th><th>Current Asset</th><th>Effective Serial</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for c in configs %}
+  <tr>
+    <td><a href="{% url 'config_detail' c.pk %}">{{ c }}</a></td>
+    <td><span class="badge badge-{{ c.config_type }}">{{ c.get_config_type_display }}</span></td>
+    <td>{% if c.host_config %}<a href="{% url 'config_detail' c.host_config.pk %}">{{ c.host_config }}</a>{% else %}—{% endif %}</td>
+    <td>{% with asset=c.current_asset %}{% if asset %}<a href="{% url 'asset_detail' asset.pk %}">{{ asset }}</a>{% else %}—{% endif %}{% endwith %}</td>
+    <td>{{ c.effective_serial|default:"—" }}</td>
+    <td><a href="{% url 'config_edit' c.pk %}" class="btn btn-secondary btn-sm">Edit</a></td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="6" style="color:#94a3b8;text-align:center;padding:20px">No configs found</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ asset }} — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ asset }}</h1>
+  <div class="actions">
+    <a href="{% url 'asset_edit' asset.pk %}" class="btn btn-secondary">Edit</a>
+    <a href="{% url 'asset_retire' asset.pk %}" class="btn btn-secondary">Change Status</a>
+    <a href="{% url 'maintenance_add' asset.pk %}" class="btn btn-secondary">+ Maintenance</a>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div class="card">
+    <h3>Hardware</h3>
+    <table>
+      <tr><td>Make</td><td>{{ asset.make|default:"—" }}</td></tr>
+      <tr><td>Model</td><td>{{ asset.model|default:"—" }}</td></tr>
+      <tr><td>Serial</td><td>{{ asset.serial|default:"—" }}</td></tr>
+      <tr><td>Effective Serial</td><td>{{ asset.effective_serial|default:"—" }}</td></tr>
+      <tr><td>Type</td><td>{{ asset.asset_type|default:"—" }}</td></tr>
+      <tr><td>Status</td><td><span class="badge badge-{{ asset.status }}">{{ asset.get_status_display }}</span></td></tr>
+      <tr><td>Location</td><td>{{ asset.location|default:"—" }}</td></tr>
+    </table>
+    {% if asset.notes %}<p style="margin-top:10px;color:#64748b;font-size:13px">{{ asset.notes }}</p>{% endif %}
+  </div>
+
+  <div>
+    {% if purchase %}
+    <div class="card">
+      <h3>Purchase</h3>
+      <table>
+        <tr><td>Vendor</td><td>{{ purchase.vendor|default:"—" }}</td></tr>
+        <tr><td>Cost</td><td>{% if purchase.cost %}${{ purchase.cost }}{% else %}—{% endif %}</td></tr>
+        <tr><td>PO #</td><td>{{ purchase.po_number|default:"—" }}</td></tr>
+        <tr><td>Invoice</td><td>{{ purchase.invoice|default:"—" }}</td></tr>
+        <tr><td>Date</td><td>{{ purchase.purchase_date|default:"—" }}</td></tr>
+      </table>
+    </div>
+    {% endif %}
+    {% if warranty %}
+    <div class="card">
+      <h3>Warranty</h3>
+      <table>
+        <tr><td>Start</td><td>{{ warranty.start_date|default:"—" }}</td></tr>
+        <tr><td>End</td><td>{{ warranty.end_date|default:"—" }}{% if warranty.is_expired %} <span class="badge badge-disposed">Expired</span>{% endif %}</td></tr>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if configs %}
+<h2>Configs linked to this asset</h2>
+<table>
+  <thead><tr><th>Config</th><th>Assigned</th><th>Removed</th></tr></thead>
+  <tbody>
+  {% for h in configs %}
+  <tr>
+    <td><a href="{% url 'config_detail' h.config.pk %}">{{ h.config.hostname }}</a></td>
+    <td>{{ h.assigned_date }}</td>
+    <td>{{ h.removed_date|default:"current" }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>Maintenance Log</h2>
+<table>
+  <thead><tr><th>Date</th><th>Description</th><th>Performed by</th></tr></thead>
+  <tbody>
+  {% for log in maintenance_logs %}
+  <tr>
+    <td>{{ log.date }}</td>
+    <td>{{ log.description }}</td>
+    <td>{{ log.performed_by|default:"—" }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="3" style="color:#94a3b8">No maintenance records</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

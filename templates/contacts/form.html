@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — ITAM{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ title }}</h1>
+  {% if contact %}<a href="{% url 'contact_detail' contact.pk %}" class="btn btn-secondary">Cancel</a>{% else %}<a href="{% url 'contact_list' %}" class="btn btn-secondary">Cancel</a>{% endif %}
+</div>
+<div class="card" style="max-width:400px">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label>{{ field.label }}</label>{{ field }}
+      {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+{% endblock %}
