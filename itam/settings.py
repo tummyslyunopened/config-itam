@@ -8,7 +8,11 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+
+# Reachable from any device on the LAN under whatever hostname the deployer
+# uses (e.g. http://config:8002/). The reverse proxy / firewall is the
+# gatekeeper, not Django.
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
